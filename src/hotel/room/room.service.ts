@@ -21,8 +21,13 @@ export class HotelRoomService implements IHotelRoomService {
   ) {}
 
   async create(data: CreateRoomDto): Promise<HotelRoom> {
-    const hotel = await this.hotelModel.findById(data.hotel);
-    if (!hotel) throw new NotFoundException('Такого отеля нет');
+    try {
+      const hotel = await this.hotelModel.findById(data.hotel);
+      if (!hotel) throw new NotFoundException('Такого отеля нет');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      throw new NotFoundException('Такого отеля нет');
+    }
 
     const room = new this.hotelRoomModel({ ...data });
     return room.save();
@@ -65,8 +70,13 @@ export class HotelRoomService implements IHotelRoomService {
       throw new BadRequestException('Неверный формат ID');
     }
 
-    const hotel = await this.hotelModel.findById(data.hotel);
-    if (!hotel) throw new NotFoundException('Такого отеля нет');
+    try {
+      const hotel = await this.hotelModel.findById(data.hotel);
+      if (!hotel) throw new NotFoundException('Такого отеля нет');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      throw new NotFoundException('Такого отеля нет');
+    }
 
     const updatedRoom = await this.hotelRoomModel
       .findByIdAndUpdate(id, data)
