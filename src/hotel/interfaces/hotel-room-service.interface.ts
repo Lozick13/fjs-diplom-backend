@@ -1,10 +1,12 @@
 import { ID } from 'src/types/id.type';
+import { CreateRoomDto } from '../hotel-room/dto/create-hotel-room.dto';
+import { UpdateRoomDto } from '../hotel-room/dto/update-hotel-room.dto copy';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { SearchRoomsParams } from './search-rooms-params.interface';
 
 export interface IHotelRoomService {
-  create(data: Partial<HotelRoom>): Promise<HotelRoom>;
+  create(data: CreateRoomDto): Promise<HotelRoom>;
   findById(id: ID): Promise<HotelRoom>;
   search(params: SearchRoomsParams): Promise<HotelRoom[]>;
-  update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom>;
+  update(id: ID, data: UpdateRoomDto): Promise<HotelRoom>;
 }
