@@ -10,11 +10,11 @@ import { isValidObjectId, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserParams } from './interfaces/search-user-params.interface';
-import { IUserService } from './interfaces/user-service.interface';
+import { UserService } from './interfaces/user-service.interface';
 import { User } from './schemas/user.schema';
 
 @Injectable()
-export class UsersService implements IUserService {
+export class UsersService implements UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(data: CreateUserDto): Promise<User> {
