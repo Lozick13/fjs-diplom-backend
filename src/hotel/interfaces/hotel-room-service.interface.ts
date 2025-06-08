@@ -1,6 +1,6 @@
 import { ID } from 'src/types/id.type';
-import { CreateRoomDto } from '../hotel-room/dto/create-hotel-room.dto';
-import { UpdateRoomDto } from '../hotel-room/dto/update-hotel-room.dto copy';
+import { CreateRoomDto } from '../room/dto/create-hotel-room.dto';
+import { UpdateRoomDto } from '../room/dto/update-hotel-room.dto copy';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { SearchRoomsParams } from './search-rooms-params.interface';
 

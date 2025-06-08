@@ -11,21 +11,21 @@ export class HotelController {
 
   @ApiOperation({ summary: 'Создание гостиницы' })
   @ApiResponse({ status: 200, type: Hotel })
-  @Post()
+  @Post('/create')
   create(@Body() hotelDto: CreateHotelDto) {
     return this.hotelService.create(hotelDto);
   }
 
   @ApiOperation({ summary: 'Поиск гостиницы по ID' })
   @ApiResponse({ status: 200, type: Hotel })
-  @Get(':id')
+  @Get('/search/:id')
   find(@Param('id') id: string) {
     return this.hotelService.findById(id);
   }
 
   @ApiOperation({ summary: 'Поиск гостиниц по данным' })
   @ApiResponse({ status: 200, type: [Hotel] })
-  @Get()
+  @Get('/search')
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })
   @ApiQuery({ name: 'title', required: true })
@@ -43,7 +43,7 @@ export class HotelController {
 
   @ApiOperation({ summary: 'Обновление гостиницы по ID' })
   @ApiResponse({ status: 200, type: Hotel })
-  @Post('/:id')
+  @Post('update/:id')
   update(@Param('id') id: string, @Body() data: UpdateHotelParams) {
     return this.hotelService.update(id, data);
   }

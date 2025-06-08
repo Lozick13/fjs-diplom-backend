@@ -3,29 +3,29 @@ import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { CreateRoomDto } from './dto/create-hotel-room.dto';
 import { UpdateRoomDto } from './dto/update-hotel-room.dto copy';
-import { HotelRoomService } from './hotel-room.service';
+import { HotelRoomService } from './room.service';
 
-@Controller('hotel-room')
+@Controller('hotel/room')
 export class HotelRoomController {
   constructor(private hotelRoomService: HotelRoomService) {}
 
   @ApiOperation({ summary: 'Создание комнаты' })
   @ApiResponse({ status: 200, type: HotelRoom })
-  @Post('hotel-room/')
+  @Post('/create')
   create(@Body() roomDto: CreateRoomDto) {
     return this.hotelRoomService.create(roomDto);
   }
 
   @ApiOperation({ summary: 'Поиск комнаты по ID' })
   @ApiResponse({ status: 200, type: HotelRoom })
-  @Get(':id')
+  @Get('/search/:id')
   find(@Param('id') id: string) {
     return this.hotelRoomService.findById(id);
   }
 
   @ApiOperation({ summary: 'Поиск комнаты по данным' })
   @ApiResponse({ status: 200, type: [HotelRoom] })
-  @Get()
+  @Get('/search')
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })
   @ApiQuery({ name: 'hotel', required: true })
@@ -46,7 +46,7 @@ export class HotelRoomController {
 
   @ApiOperation({ summary: 'Обновление комнаты по ID' })
   @ApiResponse({ status: 200, type: HotelRoom })
-  @Post('/:id')
+  @Post('update/:id')
   update(@Param('id') id: string, @Body() data: UpdateRoomDto) {
     return this.hotelRoomService.update(id, data);
   }
