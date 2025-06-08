@@ -28,7 +28,7 @@ export class HotelController {
   @Get()
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })
-  @ApiQuery({ name: 'title', required: false })
+  @ApiQuery({ name: 'title', required: true })
   search(
     @Query('title') title: string,
     @Query('limit') limit?: number,
