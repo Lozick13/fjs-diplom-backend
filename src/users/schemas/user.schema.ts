@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-import { UserRoles } from 'src/types/user-roles.enum';
+import { UserRole } from 'src/types/user-roles.enum';
 
 @Schema()
 export class User extends Document {
@@ -25,10 +25,11 @@ export class User extends Document {
   @Prop({
     required: true,
     unique: false,
-    default: 'client',
+    enum: UserRole,
+    default: UserRole.CLIENT,
     type: String,
   })
-  role: UserRoles;
+  role: UserRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

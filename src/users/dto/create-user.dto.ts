@@ -40,6 +40,6 @@ export class CreateUserDto {
   readonly contactPhone?: string;
 
   @IsEnum(UserRole)
-  @ApiProperty({ example: 'client', description: 'Роль' })
+  @ApiProperty({ example: UserRole.CLIENT, description: 'Роль' })
   readonly role: string;
 }
