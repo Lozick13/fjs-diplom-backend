@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { isValidObjectId, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
+import { validateEmail } from 'src/utils/validation';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserParams } from './interfaces/search-user-params.interface';
 import { IUserService } from './interfaces/user-service.interface';
@@ -42,6 +43,10 @@ export class UsersService implements IUserService {
   }
 
   async findByEmail(email: string): Promise<User> {
+    if (!validateEmail(email)) {
+      throw new BadRequestException('Некорректный формат email');
+    }
+
     const user = await this.userModel.findOne({ email: email });
     if (!user) {
       throw new NotFoundException('Пользователь не найден');
