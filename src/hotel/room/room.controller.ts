@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { CreateRoomDto } from './dto/create-hotel-room.dto';
@@ -12,8 +22,12 @@ export class HotelRoomController {
   @ApiOperation({ summary: 'Создание комнаты' })
   @ApiResponse({ status: 200, type: HotelRoom })
   @Post('/create')
-  create(@Body() roomDto: CreateRoomDto) {
-    return this.hotelRoomService.create(roomDto);
+  @UseInterceptors(FilesInterceptor('images'))
+  create(
+    @Body() roomDto: CreateRoomDto,
+    @UploadedFiles() images: Express.Multer.File[],
+  ) {
+    return this.hotelRoomService.create(roomDto, images);
   }
 
   @ApiOperation({ summary: 'Поиск комнаты по ID' })

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
+import { FilesService } from 'src/files/files.service';
 import { ID } from 'src/types/id.type';
 import { IHotelRoomService } from '../interfaces/hotel-room-service.interface';
 import { SearchRoomsParams } from '../interfaces/search-rooms-params.interface';
@@ -18,18 +19,31 @@ export class HotelRoomService implements IHotelRoomService {
   constructor(
     @InjectModel(HotelRoom.name) private hotelRoomModel: Model<HotelRoom>,
     @InjectModel(Hotel.name) private hotelModel: Model<Hotel>,
+    private fileService: FilesService,
   ) {}
 
-  async create(data: CreateRoomDto): Promise<HotelRoom> {
+  async create(
+    data: CreateRoomDto,
+    images: Express.Multer.File[],
+  ): Promise<HotelRoom> {
+    if (!images || !images.length) {
+      throw new BadRequestException(
+        'Необходимо загрузить хотя бы одно изображение',
+      );
+    }
     try {
       const hotel = await this.hotelModel.findById(data.hotel);
       if (!hotel) throw new NotFoundException('Такого отеля нет');
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch (error) {
+      console.log('Отель не найден:', error);
       throw new NotFoundException('Такого отеля нет');
     }
 
-    const room = new this.hotelRoomModel({ ...data });
+    const filesName: string[] = await Promise.all(
+      images.map((image) => this.fileService.createFile(image)),
+    );
+
+    const room = new this.hotelRoomModel({ ...data, images: filesName });
     return room.save();
   }
 
