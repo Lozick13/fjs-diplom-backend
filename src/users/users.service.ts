@@ -19,7 +19,11 @@ export class UsersService implements IUserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(data: CreateUserDto): Promise<User> {
-    const existingUser = await this.userModel.findOne({ email: data.email });
+    const normalizedEmail = data.email.toLowerCase().trim();
+    const existingUser = await this.userModel.findOne({
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') },
+    });
+
     if (existingUser) {
       throw new ConflictException(
         'Пользователь с таким email уже зарегистрирован',
@@ -27,7 +31,11 @@ export class UsersService implements IUserService {
     }
 
     const hash = await bcrypt.hash(data.password, 10);
-    const user = new this.userModel({ ...data, passwordHash: hash });
+    const user = new this.userModel({
+      ...data,
+      email: normalizedEmail,
+      passwordHash: hash,
+    });
     return user.save();
   }
 
