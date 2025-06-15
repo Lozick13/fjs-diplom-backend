@@ -8,5 +8,5 @@ export interface IHotelRoomService {
   create(data: CreateRoomDto, images: any[]): Promise<HotelRoom>;
   findById(id: ID): Promise<HotelRoom>;
   search(params: SearchRoomsParams): Promise<HotelRoom[]>;
-  update(id: ID, data: UpdateRoomDto): Promise<HotelRoom>;
+  update(id: ID, data: UpdateRoomDto, images: any[]): Promise<HotelRoom>;
 }

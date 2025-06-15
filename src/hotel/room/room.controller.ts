@@ -9,12 +9,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { CreateRoomDto } from './dto/create-hotel-room.dto';
 import { UpdateRoomDto } from './dto/update-hotel-room.dto copy';
 import { HotelRoomService } from './room.service';
 
+@ApiTags('Комнаты')
 @Controller('hotel/room')
 export class HotelRoomController {
   constructor(private hotelRoomService: HotelRoomService) {}
@@ -61,7 +62,12 @@ export class HotelRoomController {
   @ApiOperation({ summary: 'Обновление комнаты по ID' })
   @ApiResponse({ status: 200, type: HotelRoom })
   @Post('update/:id')
-  update(@Param('id') id: string, @Body() data: UpdateRoomDto) {
-    return this.hotelRoomService.update(id, data);
+  @UseInterceptors(FilesInterceptor('images'))
+  update(
+    @Param('id') id: string,
+    @Body() data: UpdateRoomDto,
+    @UploadedFiles() images: Express.Multer.File[],
+  ) {
+    return this.hotelRoomService.update(id, data, images);
   }
 }

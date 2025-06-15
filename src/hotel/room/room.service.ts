@@ -34,8 +34,11 @@ export class HotelRoomService implements IHotelRoomService {
     try {
       const hotel = await this.hotelModel.findById(data.hotel);
       if (!hotel) throw new NotFoundException('Такого отеля нет');
-    } catch (error) {
-      console.log('Отель не найден:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        console.log('Отель не найден:', error.message);
+      else console.log('Произошла неизвестная ошибка');
+
       throw new NotFoundException('Такого отеля нет');
     }
 
@@ -79,21 +82,40 @@ export class HotelRoomService implements IHotelRoomService {
       .limit(limit);
   }
 
-  async update(id: ID, data: UpdateRoomDto): Promise<HotelRoom> {
+  async update(
+    id: ID,
+    data: UpdateRoomDto,
+    images: Express.Multer.File[],
+  ): Promise<HotelRoom> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Неверный формат ID');
     }
-
+    if (!images || !images.length) {
+      throw new BadRequestException(
+        'Необходимо загрузить хотя бы одно изображение',
+      );
+    }
     try {
       const hotel = await this.hotelModel.findById(data.hotel);
       if (!hotel) throw new NotFoundException('Такого отеля нет');
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        console.log('Отель не найден:', error.message);
+      else console.log('Произошла неизвестная ошибка');
+
       throw new NotFoundException('Такого отеля нет');
     }
 
+    const filesName: string[] = await Promise.all(
+      images.map((image) => this.fileService.createFile(image)),
+    );
+
     const updatedRoom = await this.hotelRoomModel
-      .findByIdAndUpdate(id, data)
+      .findByIdAndUpdate(
+        id,
+        { $set: { ...data, images: filesName } },
+        { new: true },
+      )
       .exec();
     if (!updatedRoom) {
       throw new NotFoundException('Гостиница не найдена');
