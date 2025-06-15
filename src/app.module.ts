@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 import { HotelModule } from './hotel/hotel.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   controllers: [],
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
     ),
     UsersModule,
     HotelModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
