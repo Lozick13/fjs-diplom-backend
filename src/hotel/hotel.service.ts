@@ -48,7 +48,7 @@ export class HotelService implements IHotelService {
       throw new BadRequestException('Неверный формат ID');
     }
     const updatedHotel = await this.hotelModel
-      .findByIdAndUpdate(id, data)
+      .findByIdAndUpdate(id, { $set: data }, { new: true })
       .exec();
     if (!updatedHotel) {
       throw new NotFoundException('Гостиница не найдена');

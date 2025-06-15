@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { HotelService } from './hotel.service';
 import { UpdateHotelParams } from './interfaces/update-hotel-params.interfaces';
 import { Hotel } from './schemas/hotel.schema';
 
+@ApiTags('Гостиницы')
 @Controller('hotel')
 export class HotelController {
   constructor(private hotelService: HotelService) {}
