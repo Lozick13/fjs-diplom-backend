@@ -3,9 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
-import { HotelModule } from './hotel/hotel.module';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { HotelModule } from './hotel/hotel.module';
+import { ReservationModule } from './reservation/reservation.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   controllers: [],
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     HotelModule,
     AuthModule,
+    ReservationModule,
   ],
 })
 export class AppModule {}
