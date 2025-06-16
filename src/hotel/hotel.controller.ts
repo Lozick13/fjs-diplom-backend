@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/decorators/auth.decorator';
+import { UserRole } from 'src/types/user-roles.enum';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { HotelService } from './hotel.service';
 import { UpdateHotelParams } from './interfaces/update-hotel-params.interfaces';
@@ -12,6 +14,7 @@ export class HotelController {
 
   @ApiOperation({ summary: 'Создание гостиницы' })
   @ApiResponse({ status: 200, type: Hotel })
+  @Auth(UserRole.ADMIN)
   @Post('/create')
   create(@Body() hotelDto: CreateHotelDto) {
     return this.hotelService.create(hotelDto);
@@ -44,6 +47,7 @@ export class HotelController {
 
   @ApiOperation({ summary: 'Обновление гостиницы по ID' })
   @ApiResponse({ status: 200, type: Hotel })
+  @Auth(UserRole.ADMIN)
   @Post('update/:id')
   update(@Param('id') id: string, @Body() data: UpdateHotelParams) {
     return this.hotelService.update(id, data);

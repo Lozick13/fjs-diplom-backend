@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/decorators/auth.decorator';
+import { UserRole } from 'src/types/user-roles.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
@@ -11,6 +13,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Создание пользователя' })
   @ApiResponse({ status: 200, type: User })
+  @Auth(UserRole.ADMIN)
   @Post('/create')
   create(@Body() userDto: CreateUserDto) {
     return this.usersService.create(userDto);
@@ -18,6 +21,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Поиск пользователя по ID' })
   @ApiResponse({ status: 200, type: User })
+  @Auth(UserRole.ADMIN, UserRole.MANAGER)
   @Get('/search/:id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(id);
@@ -25,6 +29,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Поиск пользователя по email' })
   @ApiResponse({ status: 200, type: User })
+  @Auth(UserRole.ADMIN, UserRole.MANAGER)
   @Get('search/email/:email')
   findByEmail(@Param('email') email: string) {
     return this.usersService.findByEmail(email);
@@ -32,6 +37,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Поиск пользователей по данным' })
   @ApiResponse({ status: 200, type: [User] })
+  @Auth(UserRole.ADMIN, UserRole.MANAGER)
   @Get('/search')
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })

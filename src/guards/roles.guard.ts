@@ -17,15 +17,17 @@ export class RolesGuard implements CanActivate {
     if (!roles || roles.length === 0) {
       return true;
     }
+
     const request = context.switchToHttp().getRequest<Request>();
     const user = request.user as User;
-    const grantAccess = roles[0]
-      .toLocaleLowerCase()
-      .includes(user.role.toLocaleLowerCase());
 
-    if (!grantAccess) {
+    const hasAccess = roles.some(
+      (role) => user.role.toLowerCase() === role.toLowerCase(),
+    );
+    if (!hasAccess) {
       throw new ForbiddenException('Доступ запрещен');
     }
-    return user && user.role && grantAccess;
+
+    return true;
   }
 }

@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/decorators/auth.decorator';
+import { UserRole } from 'src/types/user-roles.enum';
 import { HotelRoom } from '../schemas/hotel-room.schema';
 import { CreateRoomDto } from './dto/create-hotel-room.dto';
 import { UpdateRoomDto } from './dto/update-hotel-room.dto copy';
@@ -22,6 +24,7 @@ export class HotelRoomController {
 
   @ApiOperation({ summary: 'Создание комнаты' })
   @ApiResponse({ status: 200, type: HotelRoom })
+  @Auth(UserRole.ADMIN)
   @Post('/create')
   @UseInterceptors(FilesInterceptor('images'))
   create(
@@ -61,6 +64,7 @@ export class HotelRoomController {
 
   @ApiOperation({ summary: 'Обновление комнаты по ID' })
   @ApiResponse({ status: 200, type: HotelRoom })
+  @Auth(UserRole.ADMIN)
   @Post('update/:id')
   @UseInterceptors(FilesInterceptor('images'))
   update(
