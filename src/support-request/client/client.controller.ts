@@ -1,12 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ID } from 'src/types/id.type';
 import { CreateSupportRequestDto } from '../dto/create-support-request.dto';
 import { MarkMessagesAsReadDto } from '../dto/mark-messages-as-read.dto';
 import { SupportRequest } from '../schemas/support-request.schema';
@@ -32,11 +33,11 @@ export class ClientController {
     return this.clientService.markMessagesAsRead(params);
   }
 
-  @ApiOperation({ summary: 'Пометка сообщений' })
+  @ApiOperation({ summary: 'Количество непрочитанных сообщений' })
   @ApiResponse({ status: 200 })
-  @Post('/mark')
+  @Get('/unread-count/:id')
   @UsePipes(new ValidationPipe({ transform: true }))
-  getUnread(@Body() supportRequest: ID) {
-    return this.clientService.getUnreadCount(supportRequest);
+  getUnread(@Param('id') id: string) {
+    return this.clientService.getUnreadCount(id);
   }
 }
