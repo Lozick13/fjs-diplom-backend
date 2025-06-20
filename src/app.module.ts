@@ -6,6 +6,7 @@ import * as path from 'path';
 import { AuthModule } from './auth/auth.module';
 import { HotelModule } from './hotel/hotel.module';
 import { ReservationModule } from './reservation/reservation.module';
+import { SupportRequestModule } from './support-request/support-request.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     HotelModule,
     AuthModule,
     ReservationModule,
+    SupportRequestModule,
   ],
 })
 export class AppModule {}
