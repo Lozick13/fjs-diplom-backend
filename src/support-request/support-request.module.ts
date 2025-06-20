@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ClientModule } from './client/client.module';
 import { ClientService } from './client/client.service';
+import { EmployeeModule } from './employee/employee.module';
 import { Message, MessagesSchema } from './schemas/message.schema';
 import {
   SupportRequest,
@@ -17,6 +18,7 @@ import { SupportRequestService } from './support-request.service';
     ]),
     MongooseModule.forFeature([{ name: Message.name, schema: MessagesSchema }]),
     ClientModule,
+    EmployeeModule,
   ],
   providers: [SupportRequestService, ClientService],
   controllers: [SupportRequestController],
