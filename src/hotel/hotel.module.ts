@@ -12,5 +12,6 @@ import { Hotel, HotelSchema } from './schemas/hotel.schema';
     MongooseModule.forFeature([{ name: Hotel.name, schema: HotelSchema }]),
     HotelRoomModule,
   ],
+  exports: [HotelService],
 })
 export class HotelModule {}

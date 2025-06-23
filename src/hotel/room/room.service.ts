@@ -64,22 +64,17 @@ export class HotelRoomService implements IHotelRoomService {
   async search(params: SearchRoomsParams): Promise<HotelRoom[]> {
     const { limit = 10, offset = 0, hotel, isEnabled } = params;
 
-    if (typeof isEnabled === 'boolean') {
-      return this.hotelRoomModel
-        .find({
-          hotel: { $regex: hotel, $options: 'i' },
-          isEnabled: isEnabled,
-        })
-        .skip(offset)
-        .limit(limit);
+    const query: Record<string, any> = {};
+
+    if (hotel) {
+      query.hotel = { $regex: hotel, $options: 'i' };
     }
 
-    return this.hotelRoomModel
-      .find({
-        hotel: { $regex: hotel, $options: 'i' },
-      })
-      .skip(offset)
-      .limit(limit);
+    if (typeof isEnabled === 'boolean') {
+      query.isEnabled = isEnabled;
+    }
+
+    return this.hotelRoomModel.find(query).skip(offset).limit(limit);
   }
 
   async update(

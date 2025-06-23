@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from 'src/files/files.module';
+import { HotelModule } from '../hotel.module';
 import { HotelRoom, HotelRoomSchema } from '../schemas/hotel-room.schema';
 import { Hotel, HotelSchema } from '../schemas/hotel.schema';
 import { HotelRoomController } from './room.controller';
@@ -15,6 +16,7 @@ import { HotelRoomService } from './room.service';
       { name: HotelRoom.name, schema: HotelRoomSchema },
     ]),
     FilesModule,
+    forwardRef(() => HotelModule),
   ],
 })
 export class HotelRoomModule {}
