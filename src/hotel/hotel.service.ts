@@ -33,7 +33,7 @@ export class HotelService implements IHotelService {
   }
 
   async search(params: SearchHotelParams): Promise<Hotel[]> {
-    const { limit = 10, offset = 0, title } = params;
+    const { limit = 10, offset = 0, title = '' } = params;
 
     return this.hotelModel
       .find({
