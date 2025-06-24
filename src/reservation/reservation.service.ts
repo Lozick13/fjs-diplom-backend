@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationSearchOptionsDto } from './dto/reservation-search-options.dto';
@@ -54,17 +54,24 @@ export class ReservationService implements IReservation {
   ): Promise<Reservation[]> {
     const { userId, dateStart, dateEnd } = filter;
 
-    if (dateStart > dateEnd) {
+    if (dateStart && dateEnd && dateStart > dateEnd) {
       throw new BadRequestException(
         'Дата окончания должна быть позже даты начала',
       );
     }
 
-    const query = {
-      userId,
-      dateStart: { $gte: new Date(dateStart) },
-      dateEnd: { $lte: new Date(dateEnd) },
-    };
+    const query: FilterQuery<ReservationSearchOptionsDto> = { userId };
+
+    if (dateStart) {
+      query.dateStart = { $gte: new Date(dateStart) };
+    }
+    if (dateEnd) {
+      query.dateEnd = { $lte: new Date(dateEnd) };
+    }
     return await this.reservationModel.find(query).exec();
+  }
+
+  async getReservationById(id: ID): Promise<Reservation | null> {
+    return await this.reservationModel.findById(id).exec();
   }
 }

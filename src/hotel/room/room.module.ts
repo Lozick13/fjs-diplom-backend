@@ -18,5 +18,6 @@ import { HotelRoomService } from './room.service';
     FilesModule,
     forwardRef(() => HotelModule),
   ],
+  exports: [HotelRoomService],
 })
 export class HotelRoomModule {}

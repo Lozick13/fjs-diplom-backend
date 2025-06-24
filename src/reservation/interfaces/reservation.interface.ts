@@ -9,4 +9,5 @@ export interface IReservation {
   getReservations(
     filter: ReservationSearchOptionsDto,
   ): Promise<Array<Reservation>>;
+  getReservationById(id: ID): Promise<Reservation | null>;
 }
