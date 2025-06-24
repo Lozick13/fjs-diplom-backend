@@ -110,10 +110,9 @@ export class ReservationController {
 
   @ApiOperation({ summary: 'Удаление брони' })
   @ApiResponse({ status: 200 })
-  @Auth(UserRole.CLIENT, UserRole.MANAGER)
+  @Auth(UserRole.CLIENT)
   @Delete('client/reservations/:id')
-  @Delete('manager/reservations/:id')
-  async remove(
+  async removeClient(
     @Param('id') id: string,
     @LoggedUser() user: { id: ID; role: UserRole },
   ) {
@@ -127,6 +126,14 @@ export class ReservationController {
       }
     }
 
+    await this.reservationService.removeReservation(id);
+  }
+
+  @ApiOperation({ summary: 'Удаление брони' })
+  @ApiResponse({ status: 200 })
+  @Auth(UserRole.CLIENT, UserRole.MANAGER)
+  @Delete('manager/reservations/:id')
+  async removeManager(@Param('id') id: string) {
     await this.reservationService.removeReservation(id);
   }
 
