@@ -12,7 +12,7 @@ export class MarkMessagesAsReadDto {
   @IsString()
   @MaxLength(1000)
   @ApiProperty({
-    example: '20-02-2025',
+    example: '2025-06-20T09:16:55.193+00:00',
     description: 'Дата создания',
   })
   readonly createdBefore: Date;

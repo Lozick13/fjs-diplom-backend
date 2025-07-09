@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UsersModule } from 'src/users/users.module';
 import { ClientModule } from './client/client.module';
 import { ClientService } from './client/client.service';
 import { EmployeeModule } from './employee/employee.module';
+import { EmployeeService } from './employee/employee.service';
 import { Message, MessagesSchema } from './schemas/message.schema';
 import {
   SupportRequest,
@@ -17,10 +19,12 @@ import { SupportRequestService } from './support-request.service';
       { name: SupportRequest.name, schema: SupportRequestSchema },
     ]),
     MongooseModule.forFeature([{ name: Message.name, schema: MessagesSchema }]),
-    ClientModule,
-    EmployeeModule,
+    forwardRef(() => ClientModule),
+    forwardRef(() => EmployeeModule),
+    UsersModule,
   ],
-  providers: [SupportRequestService, ClientService],
+  providers: [SupportRequestService, ClientService, EmployeeService],
   controllers: [SupportRequestController],
+  exports: [SupportRequestService],
 })
 export class SupportRequestModule {}

@@ -10,7 +10,7 @@ export class Message extends Document {
 
   @ApiProperty({ example: '20-05-2025', description: 'Дата отправки' })
   @Prop({ required: true, unique: false })
-  sendAt: Date;
+  sentAt: Date;
 
   @ApiProperty({
     example: 'Тестовое сообщение',
@@ -22,6 +22,7 @@ export class Message extends Document {
   @ApiProperty({ example: '20-05-2025', description: 'Дата прочтения' })
   @Prop({ required: false, unique: false })
   readAt: Date;
+  createdAt: Date;
 }
 
 export const MessagesSchema = SchemaFactory.createForClass(Message);

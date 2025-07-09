@@ -1,13 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
 import { MarkMessagesAsReadDto } from '../dto/mark-messages-as-read.dto';
+import { ISupportRequestEmployeeService } from '../interfaces/SupportRequestEmployeeService.interface';
 import { Message } from '../schemas/message.schema';
 import { SupportRequest } from '../schemas/support-request.schema';
 
 @Injectable()
-export class EmployeeService {
+export class EmployeeService implements ISupportRequestEmployeeService {
   constructor(
     @InjectModel(SupportRequest.name)
     private supportRequestModel: Model<SupportRequest>,
@@ -25,7 +30,7 @@ export class EmployeeService {
     const messagesId = supportRequestEntity.messages;
     const messages = await this.messageModel.find({
       _id: { $in: messagesId },
-      author: { $ne: user },
+      author: user,
       sentAt: { $lt: createdBefore },
       readAt: { $exists: false },
     });
@@ -47,7 +52,7 @@ export class EmployeeService {
     const messageIds = supportRequestEntity.messages;
     const messages = await this.messageModel.find({
       _id: { $in: messageIds },
-      author: { $ne: userId },
+      author: userId,
       readAt: { $exists: false },
     });
 
@@ -55,6 +60,10 @@ export class EmployeeService {
   }
 
   async closeRequest(supportRequest: ID): Promise<void> {
+    if (!isValidObjectId(supportRequest)) {
+      throw new BadRequestException('Неверный ID чата');
+    }
+
     const result = await this.supportRequestModel.updateOne(
       { _id: supportRequest },
       { $set: { isActive: false } },

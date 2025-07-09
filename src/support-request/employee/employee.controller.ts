@@ -1,42 +1,60 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { MarkMessagesAsReadDto } from '../dto/mark-messages-as-read.dto';
-import { EmployeeService } from './employee.service';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/decorators/auth.decorator';
+import { UserRole } from 'src/types/user-roles.enum';
+import { User } from 'src/users/schemas/user.schema';
+import { UsersService } from 'src/users/users.service';
+import { GetChatListParams } from '../interfaces/GetChatListParams.interface';
+import { SupportRequest } from '../schemas/support-request.schema';
+import { SupportRequestService } from '../support-request.service';
 
 @ApiTags('Чат сотрудника')
-@Controller('employee')
+@Controller('manager')
 export class EmployeeController {
-  constructor(private employeeService: EmployeeService) {}
+  constructor(
+    private supportRequestService: SupportRequestService,
+    private usersService: UsersService,
+  ) {}
 
-  @ApiOperation({ summary: 'Пометка сообщений' })
-  @ApiResponse({ status: 200 })
-  @Post('/mark')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  mark(@Body() params: MarkMessagesAsReadDto) {
-    return this.employeeService.markMessagesAsRead(params);
+  private mapToManagerResponse(request: SupportRequest, user: User) {
+    return {
+      id: request._id,
+      createdAt: request.createdAt,
+      isActive: request.isActive,
+      hasNewMessages: true,
+      client: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        contactPhone: user.contactPhone,
+      },
+    };
   }
 
-  @ApiOperation({ summary: 'Количество непрочитанных сообщений' })
+  @ApiOperation({ summary: 'Получение списка обращений менеджером' })
   @ApiResponse({ status: 200 })
-  @Get('/unread-count/:id')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  getUnread(@Param('id') id: string) {
-    return this.employeeService.getUnreadCount(id);
-  }
+  @Auth(UserRole.MANAGER)
+  @Get('support-requests')
+  @ApiQuery({ name: 'isActive', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'offset', required: false })
+  async search(
+    @Query('isActive') isActive?: boolean,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    const data: GetChatListParams = {
+      isActive,
+      limit,
+      offset,
+    };
 
-  @ApiOperation({ summary: 'Зыкрытие чата' })
-  @ApiResponse({ status: 200 })
-  @Get('/close/:id')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  close(@Param('id') id: string) {
-    return this.employeeService.closeRequest(id);
+    const requests = await this.supportRequestService.findSupportRequests(data);
+    return await Promise.all(
+      requests.map(async (request) => {
+        const user = await this.usersService.findById(request.user.toString());
+        return this.mapToManagerResponse(request, user);
+      }),
+    );
   }
 }

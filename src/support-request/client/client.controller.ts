@@ -1,43 +1,75 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import mongoose from 'mongoose';
+import { Auth } from 'src/decorators/auth.decorator';
+import { LoggedUser } from 'src/decorators/user.decorator';
+import { ID } from 'src/types/id.type';
+import { UserRole } from 'src/types/user-roles.enum';
+import { UsersService } from 'src/users/users.service';
 import { CreateSupportRequestDto } from '../dto/create-support-request.dto';
-import { MarkMessagesAsReadDto } from '../dto/mark-messages-as-read.dto';
+import { GetChatListParams } from '../interfaces/GetChatListParams.interface';
 import { SupportRequest } from '../schemas/support-request.schema';
+import { SupportRequestService } from '../support-request.service';
 import { ClientService } from './client.service';
 
 @ApiTags('Чат клиента')
-@Controller('support-request/client')
+@Controller('client')
 export class ClientController {
-  constructor(private clientService: ClientService) {}
+  constructor(
+    private clientService: ClientService,
+    private usersService: UsersService,
+    private supportRequestService: SupportRequestService,
+  ) {}
+
+  private mapToClientResponse(request: SupportRequest) {
+    return {
+      id: request._id,
+      createdAt: request.createdAt,
+      isActive: request.isActive,
+      hasNewMessages: true,
+    };
+  }
 
   @ApiOperation({ summary: 'Создание чата' })
-  @ApiResponse({ status: 200, type: SupportRequest })
-  @Post('/create')
-  create(@Body() data: CreateSupportRequestDto) {
-    return this.clientService.createSupportRequest(data);
+  @ApiResponse({ status: 200 })
+  @Auth(UserRole.CLIENT)
+  @Post('support-requests')
+  async create(
+    @Body() bodyData: { text: string },
+    @LoggedUser('email') email: string,
+  ) {
+    const user = await this.usersService.findByEmail(email);
+    const data: CreateSupportRequestDto = {
+      user: (user._id as mongoose.Types.ObjectId).toString() as ID,
+      text: bodyData.text,
+    };
+
+    const request = await this.clientService.createSupportRequest(data);
+    return this.mapToClientResponse(request);
   }
 
-  @ApiOperation({ summary: 'Пометка сообщений' })
+  @ApiOperation({ summary: 'Получение списка обращений клиентом' })
   @ApiResponse({ status: 200 })
-  @Post('/mark')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  mark(@Body() params: MarkMessagesAsReadDto) {
-    return this.clientService.markMessagesAsRead(params);
-  }
+  @Auth(UserRole.CLIENT)
+  @Get('support-requests')
+  @ApiQuery({ name: 'isActive', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'offset', required: false })
+  async search(
+    @LoggedUser('email') email: string,
+    @Query('isActive') isActive?: boolean,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    const user = await this.usersService.findByEmail(email);
+    const data: GetChatListParams = {
+      user: (user._id as mongoose.Types.ObjectId).toString() as ID,
+      isActive,
+      limit,
+      offset,
+    };
 
-  @ApiOperation({ summary: 'Количество непрочитанных сообщений' })
-  @ApiResponse({ status: 200 })
-  @Get('/unread-count/:id')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  getUnread(@Param('id') id: string) {
-    return this.clientService.getUnreadCount(id);
+    const requests = await this.supportRequestService.findSupportRequests(data);
+    return requests.map((request) => this.mapToClientResponse(request));
   }
 }
