@@ -9,7 +9,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { Auth } from 'src/decorators/auth.decorator';
 import { LoggedUser } from 'src/decorators/user.decorator';
@@ -41,6 +47,7 @@ export class ReservationController {
     hotel: Hotel,
   ) {
     return {
+      id: reservation._id,
       startDate: reservation.dateStart,
       endDate: reservation.dateEnd,
       hotelRoom: {
@@ -56,6 +63,7 @@ export class ReservationController {
 
   @ApiOperation({ summary: 'Добавление брони' })
   @ApiResponse({ status: 200 })
+  @ApiBody({ type: AddReservationDto })
   @Auth(UserRole.CLIENT)
   @Post('client/reservations')
   async add(
@@ -114,9 +122,10 @@ export class ReservationController {
   @Delete('client/reservations/:id')
   async removeClient(
     @Param('id') id: string,
-    @LoggedUser() user: { id: ID; role: UserRole },
+    @LoggedUser() { email, role }: { email: string; role: UserRole },
   ) {
-    if (user.role === UserRole.CLIENT) {
+    if (role === UserRole.CLIENT) {
+      const user = await this.usersService.findByEmail(email);
       const reservation = await this.reservationService.getReservationById(id);
       if (!reservation) {
         throw new NotFoundException('Бронь не найдена');

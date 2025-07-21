@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { isValidObjectId, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
+import { UserRole } from 'src/types/user-roles.enum';
 import { validateEmail } from 'src/utils/validation';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserParams } from './interfaces/search-user-params.interface';
@@ -19,6 +20,10 @@ export class UsersService implements IUserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(data: CreateUserDto): Promise<User> {
+    if (!Object.values(UserRole).includes(data.role)) {
+      throw new BadRequestException('Указана недопустимая роль пользователя');
+    }
+
     const normalizedEmail = data.email.toLowerCase().trim();
     const existingUser = await this.userModel.findOne({
       email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') },

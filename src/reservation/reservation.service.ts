@@ -17,11 +17,24 @@ export class ReservationService implements IReservation {
     @InjectModel(Reservation.name) private reservationModel: Model<Reservation>,
   ) {}
 
-  async addReservation(data: CreateReservationDto): Promise<Reservation> {
-    if (data.dateStart >= data.dateEnd)
+  private validateDates(dateStart: Date, dateEnd: Date): void {
+    if (!dateStart || !dateEnd) {
+      throw new BadRequestException('Необходимо указать обе даты');
+    }
+
+    if (dateStart >= dateEnd) {
       throw new BadRequestException(
         'Дата окончания должна быть позже даты начала',
       );
+    }
+
+    if (dateStart < new Date()) {
+      throw new BadRequestException('Дата начала не может быть в прошлом');
+    }
+  }
+
+  async addReservation(data: CreateReservationDto): Promise<Reservation> {
+    this.validateDates(data.dateStart, data.dateEnd);
 
     const roomReservations = await this.reservationModel
       .find({
@@ -35,7 +48,7 @@ export class ReservationService implements IReservation {
       })
       .exec();
     if (roomReservations.length > 0)
-      throw new BadRequestException('Диапазон дат занят');
+      throw new BadRequestException('Выбранные даты уже заняты');
 
     const reservation = new this.reservationModel({ ...data });
     return reservation.save();
@@ -53,21 +66,12 @@ export class ReservationService implements IReservation {
     filter: ReservationSearchOptionsDto,
   ): Promise<Reservation[]> {
     const { userId, dateStart, dateEnd } = filter;
-
-    if (dateStart && dateEnd && dateStart > dateEnd) {
-      throw new BadRequestException(
-        'Дата окончания должна быть позже даты начала',
-      );
-    }
-
     const query: FilterQuery<ReservationSearchOptionsDto> = { userId };
 
-    if (dateStart) {
-      query.dateStart = { $gte: new Date(dateStart) };
-    }
-    if (dateEnd) {
-      query.dateEnd = { $lte: new Date(dateEnd) };
-    }
+    if (dateStart && dateEnd) this.validateDates(dateStart, dateEnd);
+    if (dateStart) query.dateStart = { $gte: new Date(dateStart) };
+    if (dateEnd) query.dateEnd = { $lte: new Date(dateEnd) };
+
     return await this.reservationModel.find(query).exec();
   }
 

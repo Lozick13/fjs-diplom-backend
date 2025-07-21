@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { Auth } from 'src/decorators/auth.decorator';
@@ -17,6 +24,10 @@ export class UsersController {
   @Auth(UserRole.ADMIN)
   @Post('admin/users/')
   async create(@Body() userDto: CreateUserDto) {
+    if (userDto.role === UserRole.ADMIN) {
+      throw new ForbiddenException('Нельзя создать пользователя с ролью ADMIN');
+    }
+
     const user = await this.usersService.create(userDto);
     return {
       id: (user._id as mongoose.Types.ObjectId).toString() as ID,

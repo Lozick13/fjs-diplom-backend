@@ -24,7 +24,11 @@ const start = async () => {
       transform: true,
     }),
   );
-
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
   app.use(
     session({
       secret: process.env.SESSION_SECRET || 'secret-key',

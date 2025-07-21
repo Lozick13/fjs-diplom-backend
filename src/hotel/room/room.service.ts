@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model } from 'mongoose';
+import { FilterQuery, isValidObjectId, Model } from 'mongoose';
 import { FilesService } from 'src/files/files.service';
 import { ID } from 'src/types/id.type';
 import { IHotelRoomService } from '../interfaces/hotel-room-service.interface';
@@ -63,16 +63,10 @@ export class HotelRoomService implements IHotelRoomService {
 
   async search(params: SearchRoomsParams): Promise<HotelRoom[]> {
     const { limit = 10, offset = 0, hotel, isEnabled } = params;
+    const query: FilterQuery<HotelRoom> = {};
 
-    const query: Record<string, any> = {};
-
-    if (hotel) {
-      query.hotel = { $regex: hotel, $options: 'i' };
-    }
-
-    if (typeof isEnabled === 'boolean') {
-      query.isEnabled = isEnabled;
-    }
+    if (hotel) query.hotel = { $regex: hotel, $options: 'i' };
+    if (typeof isEnabled === 'boolean') query.isEnabled = isEnabled;
 
     return this.hotelRoomModel.find(query).skip(offset).limit(limit);
   }

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FilterQuery } from 'mongoose';
 import { Auth } from 'src/decorators/auth.decorator';
 import { ID } from 'src/types/id.type';
 import { UserRole } from 'src/types/user-roles.enum';
@@ -33,7 +34,7 @@ export class HotelRoomController {
     hotel?: { title?: string; description?: string } | null,
     isEnabled?: boolean,
   ) {
-    const result: Record<string, any> = {
+    const result: FilterQuery<HotelRoom> = {
       id: room._id,
       description: room.description,
       images: room.images || [],

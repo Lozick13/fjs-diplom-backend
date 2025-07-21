@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,6 +18,14 @@ export class HotelService implements IHotelService {
   constructor(@InjectModel(Hotel.name) private hotelModel: Model<Hotel>) {}
 
   async create(data: CreateHotelDto): Promise<Hotel> {
+    const existingHotel = await this.hotelModel.findOne({
+      title: { $regex: new RegExp(`^${data.title}$`, 'i') },
+    });
+
+    if (existingHotel) {
+      throw new ConflictException('Гостиница с таким названием уже существует');
+    }
+
     const hotel = new this.hotelModel({ ...data });
     return hotel.save();
   }
@@ -47,6 +56,20 @@ export class HotelService implements IHotelService {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Неверный формат ID');
     }
+
+    if (data.title) {
+      const existingHotel = await this.hotelModel.findOne({
+        _id: { $ne: id },
+        title: { $regex: new RegExp(`^${data.title}$`, 'i') },
+      });
+
+      if (existingHotel) {
+        throw new ConflictException(
+          'Гостиница с таким названием уже существует',
+        );
+      }
+    }
+
     const updatedHotel = await this.hotelModel
       .findByIdAndUpdate(id, { $set: data }, { new: true })
       .exec();

@@ -5,8 +5,15 @@ import { HotelRoom } from '../schemas/hotel-room.schema';
 import { SearchRoomsParams } from './search-rooms-params.interface';
 
 export interface IHotelRoomService {
-  create(data: CreateRoomDto, images: any[]): Promise<HotelRoom>;
+  create(
+    data: CreateRoomDto,
+    images: Express.Multer.File[],
+  ): Promise<HotelRoom>;
   findById(id: ID): Promise<HotelRoom>;
   search(params: SearchRoomsParams): Promise<HotelRoom[]>;
-  update(id: ID, data: UpdateRoomDto, images: any[]): Promise<HotelRoom>;
+  update(
+    id: ID,
+    data: UpdateRoomDto,
+    images: Express.Multer.File[],
+  ): Promise<HotelRoom>;
 }
