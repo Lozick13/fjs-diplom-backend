@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsString,
@@ -8,6 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ID } from 'src/types/id.type';
+import { UserRole } from 'src/types/user-roles.enum';
 
 export class UserSignUpResponseDto {
   @ApiProperty({
@@ -38,4 +40,14 @@ export class UserSignUpResponseDto {
     required: true,
   })
   readonly name: string;
+
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  @ApiProperty({
+    example: UserRole.CLIENT,
+    description: 'Роль',
+    enum: UserRole,
+    required: true,
+  })
+  readonly role: UserRole;
 }

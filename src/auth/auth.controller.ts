@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Req,
@@ -9,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Login } from 'src/decorators/login.decorator';
 import { ID } from 'src/types/id.type';
@@ -48,16 +50,20 @@ export class AuthController {
   })
   @Login()
   @Post('auth/login')
-  login(@Req() req: Request): UserSignInResponseDto {
+  async login(@Req() req: Request): Promise<UserSignInResponseDto> {
     const user = req.user as User;
     if (!user) {
       throw new BadRequestException('Ошибка аутентификации');
     }
 
+    const fullUser = await this.userService.findByEmail(user.email);
+
     return {
+      id: (fullUser._id as mongoose.Types.ObjectId).toString() as ID,
       email: user.email,
       name: user.name,
       contactPhone: user.contactPhone,
+      role: user.role,
     };
   }
 
@@ -105,6 +111,13 @@ export class AuthController {
       id: user._id as ID,
       email: user.email,
       name: user.name,
+      role: user.role,
     };
+  }
+
+  @Get('auth/check-session')
+  @Auth()
+  checkSession() {
+    return {};
   }
 }

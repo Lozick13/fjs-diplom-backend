@@ -101,20 +101,4 @@ export class UsersController {
       role: user.role,
     }));
   }
-
-  // @ApiOperation({ summary: 'Поиск пользователя по ID' })
-  // @ApiResponse({ status: 200, type: User })
-  // @Auth(UserRole.ADMIN, UserRole.MANAGER)
-  // @Get('/search/:id')
-  // findById(@Param('id') id: string) {
-  //   return this.usersService.findById(id);
-  // }
-
-  // @ApiOperation({ summary: 'Поиск пользователя по email' })
-  // @ApiResponse({ status: 200, type: User })
-  // @Auth(UserRole.ADMIN, UserRole.MANAGER)
-  // @Get('search/email/:email')
-  // findByEmail(@Param('email') email: string) {
-  //   return this.usersService.findByEmail(email);
-  // }
 }

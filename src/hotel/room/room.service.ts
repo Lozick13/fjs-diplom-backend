@@ -34,11 +34,7 @@ export class HotelRoomService implements IHotelRoomService {
     try {
       const hotel = await this.hotelModel.findById(data.hotel);
       if (!hotel) throw new NotFoundException('Такого отеля нет');
-    } catch (error: unknown) {
-      if (error instanceof Error)
-        console.log('Отель не найден:', error.message);
-      else console.log('Произошла неизвестная ошибка');
-
+    } catch {
       throw new NotFoundException('Такого отеля нет');
     }
 
@@ -87,11 +83,7 @@ export class HotelRoomService implements IHotelRoomService {
     try {
       const hotel = await this.hotelModel.findById(data.hotel);
       if (!hotel) throw new NotFoundException('Такого отеля нет');
-    } catch (error: unknown) {
-      if (error instanceof Error)
-        console.log('Отель не найден:', error.message);
-      else console.log('Произошла неизвестная ошибка');
-
+    } catch {
       throw new NotFoundException('Такого отеля нет');
     }
 

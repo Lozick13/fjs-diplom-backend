@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEnum,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
@@ -8,8 +10,19 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ID } from 'src/types/id.type';
+import { UserRole } from 'src/types/user-roles.enum';
 
 export class UserSignInResponseDto {
+  @ApiProperty({
+    description: 'Уникальный идентификатор',
+    example: '507f1f77bcf86cd799439011',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsMongoId()
+  id: ID;
+
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty({
@@ -39,4 +52,14 @@ export class UserSignInResponseDto {
     required: false,
   })
   readonly contactPhone?: string;
+
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  @ApiProperty({
+    example: UserRole.CLIENT,
+    description: 'Роль',
+    enum: UserRole,
+    required: true,
+  })
+  readonly role: UserRole;
 }
