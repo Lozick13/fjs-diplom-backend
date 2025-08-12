@@ -37,7 +37,7 @@ export class SupportRequestController {
   @Get('support-requests/:id/messages')
   async getMessages(
     @Param('id') id: string,
-    @LoggedUser() { email, role }: { email: string; role: UserRole },
+    @LoggedUser('email') { email, role }: { email: string; role: UserRole },
   ) {
     if (role === UserRole.CLIENT) {
       const user = await this.usersService.findByEmail(email);
@@ -80,17 +80,26 @@ export class SupportRequestController {
   @Post('support-requests/:id/messages')
   async send(
     @Param('id') id: string,
-    @LoggedUser() email: string,
-    @Body() text: string,
+    @LoggedUser('email') email: string,
+    @Body() data: { text: string },
   ) {
     const user = await this.usersService.findByEmail(email);
     const params: SendMessageDto = {
       author: (user._id as mongoose.Types.ObjectId).toString() as ID,
       supportRequest: id,
-      text,
+      text: data.text,
     };
-
-    return await this.supportRequestService.sendMessage(params);
+    const message = await this.supportRequestService.sendMessage(params);
+    return {
+      id: message._id,
+      createdAt: message.createdAt,
+      text: message.text,
+      readAt: message.readAt,
+      author: {
+        id: message.author,
+        name: user.name,
+      },
+    };
   }
 
   @ApiOperation({ summary: 'Пометка прочтения сообщений' })
@@ -99,7 +108,7 @@ export class SupportRequestController {
   @Post('support-requests/:id/messages/read')
   async mark(
     @Param('id') id: string,
-    @LoggedUser() { email, role }: { email: string; role: UserRole },
+    @LoggedUser('email') { email, role }: { email: string; role: UserRole },
     @Body() createdBefore: string,
   ) {
     let success = false;

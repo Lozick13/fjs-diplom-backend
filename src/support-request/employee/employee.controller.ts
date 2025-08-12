@@ -1,5 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Put, Query } from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Auth } from 'src/decorators/auth.decorator';
 import { UserRole } from 'src/types/user-roles.enum';
 import { User } from 'src/users/schemas/user.schema';
@@ -7,12 +13,14 @@ import { UsersService } from 'src/users/users.service';
 import { GetChatListParams } from '../interfaces/GetChatListParams.interface';
 import { SupportRequest } from '../schemas/support-request.schema';
 import { SupportRequestService } from '../support-request.service';
+import { EmployeeService } from './employee.service';
 
 @ApiTags('Чат сотрудника')
 @Controller('manager')
 export class EmployeeController {
   constructor(
     private supportRequestService: SupportRequestService,
+    private employeeService: EmployeeService,
     private usersService: UsersService,
   ) {}
 
@@ -56,5 +64,13 @@ export class EmployeeController {
         return this.mapToManagerResponse(request, user);
       }),
     );
+  }
+
+  @ApiOperation({ summary: 'Закрытие обращения поддержки' })
+  @ApiParam({ name: 'id', description: 'ID обращения' })
+  @Auth(UserRole.MANAGER)
+  @Put('support-requests/:id/close')
+  async closeRequest(@Param('id') id: string) {
+    await this.employeeService.closeRequest(id);
   }
 }

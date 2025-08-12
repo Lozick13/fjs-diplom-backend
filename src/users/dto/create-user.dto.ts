@@ -10,6 +10,7 @@ import {
   IsStrongPassword,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { UserRole } from 'src/types/user-roles.enum';
 
@@ -50,6 +51,12 @@ export class CreateUserDto {
   @ApiProperty({ example: 'Shrek', description: 'Имя' })
   readonly name: string;
 
+  @ValidateIf(
+    (o: CreateUserDto) =>
+      o.contactPhone !== undefined &&
+      o.contactPhone !== null &&
+      o.contactPhone !== '',
+  )
   @IsPhoneNumber('RU')
   @IsOptional()
   @IsString()

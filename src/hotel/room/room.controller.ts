@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -9,6 +11,7 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterQuery } from 'mongoose';
@@ -134,17 +137,48 @@ export class HotelRoomController {
   @ApiResponse({ status: 200, type: HotelRoom })
   @Auth(UserRole.ADMIN)
   @Put('admin/hotel-rooms/:id')
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('newImages'))
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseObjectIdPipe()) id: ID,
     @Body() data: UpdateRoomDto,
-    @UploadedFiles() images: Express.Multer.File[],
+    @UploadedFiles() newImages?: Express.Multer.File[],
   ) {
-    const room = await this.hotelRoomService.update(id, data, images);
-    const hotel = room.hotel
-      ? await this.hotelService.findById(room.hotel.toString() as ID)
+    let existingImages: string[] = data.existingImages || [];
+    if (typeof data.existingImages === 'string') {
+      try {
+        existingImages = JSON.parse(data.existingImages) as string[];
+      } catch {
+        throw new BadRequestException('Неверный формат existingImages');
+      }
+    } else if (Array.isArray(data.existingImages)) {
+      existingImages = data.existingImages;
+    }
+
+    if (!Array.isArray(existingImages)) {
+      throw new BadRequestException(
+        'existingImages должен быть массивом строк',
+      );
+    }
+    const existingRoom = await this.hotelRoomService.findById(id);
+    if (!existingRoom) {
+      throw new NotFoundException('Номер отеля не найден');
+    }
+
+    const updatedRoom = await this.hotelRoomService.update(
+      id,
+      {
+        hotel: data.hotel,
+        description: data.description,
+        isEnabled: data.isEnabled,
+      },
+      newImages || [],
+      existingImages,
+    );
+
+    const hotel = updatedRoom.hotel
+      ? await this.hotelService.findById(updatedRoom.hotel.toString())
       : null;
 
-    return this.mapToRoomResponseDto(room, hotel);
+    return this.mapToRoomResponseDto(updatedRoom, hotel);
   }
 }

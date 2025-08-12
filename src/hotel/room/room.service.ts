@@ -70,37 +70,48 @@ export class HotelRoomService implements IHotelRoomService {
   async update(
     id: ID,
     data: UpdateRoomDto,
-    images: Express.Multer.File[],
+    newImages: Express.Multer.File[],
+    existingImages: string[] = [],
   ): Promise<HotelRoom> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Неверный формат ID');
     }
-    if (!images || !images.length) {
-      throw new BadRequestException(
-        'Необходимо загрузить хотя бы одно изображение',
-      );
-    }
-    try {
-      const hotel = await this.hotelModel.findById(data.hotel);
-      if (!hotel) throw new NotFoundException('Такого отеля нет');
-    } catch {
-      throw new NotFoundException('Такого отеля нет');
+
+    const hotelExists = await this.hotelModel.exists({ _id: data.hotel });
+    if (!hotelExists) {
+      throw new NotFoundException('Отель не найден');
     }
 
-    const filesName: string[] = await Promise.all(
-      images.map((image) => this.fileService.createFile(image)),
+    if (!Array.isArray(existingImages)) {
+      throw new BadRequestException(
+        'existingImages должен быть массивом строк',
+      );
+    }
+
+    const uploadedImages = await Promise.all(
+      newImages.map((file) => this.fileService.createFile(file)),
     );
+
+    const allImages = [...existingImages, ...uploadedImages];
 
     const updatedRoom = await this.hotelRoomModel
       .findByIdAndUpdate(
         id,
-        { $set: { ...data, images: filesName } },
+        {
+          $set: {
+            ...data,
+            images: allImages,
+            updatedAt: new Date(),
+          },
+        },
         { new: true },
       )
       .exec();
+
     if (!updatedRoom) {
-      throw new NotFoundException('Гостиница не найдена');
+      throw new NotFoundException('Номер отеля не найден');
     }
+
     return updatedRoom;
   }
 }

@@ -12,6 +12,7 @@ import {
 } from './schemas/support-request.schema';
 import { SupportRequestController } from './support-request.controller';
 import { SupportRequestService } from './support-request.service';
+import { SupportGateway } from './websocket.gateway';
 
 @Module({
   imports: [
@@ -23,7 +24,12 @@ import { SupportRequestService } from './support-request.service';
     forwardRef(() => EmployeeModule),
     UsersModule,
   ],
-  providers: [SupportRequestService, ClientService, EmployeeService],
+  providers: [
+    SupportRequestService,
+    ClientService,
+    EmployeeService,
+    SupportGateway,
+  ],
   controllers: [SupportRequestController],
   exports: [SupportRequestService],
 })

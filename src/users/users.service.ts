@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
-import { isValidObjectId, Model } from 'mongoose';
+import { FilterQuery, isValidObjectId, Model } from 'mongoose';
 import { ID } from 'src/types/id.type';
 import { UserRole } from 'src/types/user-roles.enum';
 import { validateEmail } from 'src/utils/validation';
@@ -76,15 +76,13 @@ export class UsersService implements IUserService {
       contactPhone = '',
     } = params;
 
-    return this.userModel
-      .find({
-        $and: [
-          { email: { $regex: email, $options: 'i' } },
-          { name: { $regex: name, $options: 'i' } },
-          { contactPhone: { $regex: contactPhone, $options: 'i' } },
-        ],
-      })
-      .skip(offset)
-      .limit(limit);
+    const query: FilterQuery<User> = {};
+
+    if (email) query.email = { $regex: email, $options: 'i' };
+    if (name) query.name = { $regex: name, $options: 'i' };
+    if (contactPhone)
+      query.contactPhone = { $regex: contactPhone, $options: 'i' };
+
+    return this.userModel.find(query).skip(offset).limit(limit);
   }
 }

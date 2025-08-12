@@ -92,9 +92,9 @@ export class ReservationController {
   @ApiQuery({ name: 'dateEnd', required: false })
   async search(
     @LoggedUser('email') email: string,
-    @Query() query: ReservationSearchOptionsDto,
+    @Query() query: { dateStart?: Date; dateEnd?: Date },
   ) {
-    const user = await this.usersService.findByEmail('test1@2gmail.com');
+    const user = await this.usersService.findByEmail(email);
     const options: ReservationSearchOptionsDto = {
       userId: (user._id as mongoose.Types.ObjectId).toString(),
       dateStart: query.dateStart,
@@ -154,7 +154,7 @@ export class ReservationController {
   @ApiQuery({ name: 'dateEnd', required: false })
   async searchById(
     @Param('id') id: string,
-    @Query() query: ReservationSearchOptionsDto,
+    @Query() query: { dateStart?: Date; dateEnd?: Date },
   ) {
     const options: ReservationSearchOptionsDto = {
       userId: id,

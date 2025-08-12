@@ -61,7 +61,7 @@ export class UsersController {
       name,
       contactPhone,
     });
-    users.map((user) => ({
+    return users.map((user) => ({
       id: (user._id as mongoose.Types.ObjectId).toString() as ID,
       email: user.email,
       name: user.name,
@@ -72,7 +72,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Поиск пользователей по данным' })
   @ApiResponse({ status: 200 })
-  @Auth(UserRole.ADMIN, UserRole.MANAGER)
+  @Auth(UserRole.MANAGER)
   @Get('manager/users/')
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })
@@ -93,12 +93,14 @@ export class UsersController {
       name,
       contactPhone,
     });
-    users.map((user) => ({
-      id: (user._id as mongoose.Types.ObjectId).toString() as ID,
-      email: user.email,
-      name: user.name,
-      contactPhone: user.contactPhone,
-      role: user.role,
-    }));
+
+    return users
+      .filter((user) => user.role === UserRole.CLIENT)
+      .map((user) => ({
+        id: (user._id as mongoose.Types.ObjectId).toString() as ID,
+        email: user.email,
+        name: user.name,
+        contactPhone: user.contactPhone,
+      }));
   }
 }
