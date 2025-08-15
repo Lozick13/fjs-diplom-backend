@@ -50,7 +50,7 @@ db.hotels.insertMany([
 db.hotelrooms.insertMany([
   {
     _id: ObjectId('688f4c48d199dd13de307cf5'),
-    hotel: ObjectId('687f72932605c427d34dd8d7'),
+    hotel: '687f72932605c427d34dd8d7',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['1.jpeg', '2.jpeg'],
@@ -61,7 +61,7 @@ db.hotelrooms.insertMany([
   },
   {
     _id: ObjectId('688f4c48d199dd13de307cf6'),
-    hotel: ObjectId('687f72932605c427d34dd8d7'),
+    hotel: '687f72932605c427d34dd8d7',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['2.jpeg', '3.jpeg'],
@@ -72,7 +72,7 @@ db.hotelrooms.insertMany([
   },
   {
     _id: ObjectId('688f4c48d199dd13de307cf7'),
-    hotel: ObjectId('687f72932605c427d34dd8d8'),
+    hotel: '687f72932605c427d34dd8d8',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['3.jpeg', '1.jpeg'],
@@ -83,7 +83,7 @@ db.hotelrooms.insertMany([
   },
   {
     _id: ObjectId('688f4c48d199dd13de307cf8'),
-    hotel: ObjectId('687f72932605c427d34dd8d8'),
+    hotel: '687f72932605c427d34dd8d8',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['1.jpeg', '2.jpeg'],
@@ -94,7 +94,7 @@ db.hotelrooms.insertMany([
   },
   {
     _id: ObjectId('688f4c48d199dd13de307cf9'),
-    hotel: ObjectId('687f72932605c427d34dd8d9'),
+    hotel: '687f72932605c427d34dd8d9',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['2.jpeg', '3.jpeg'],
@@ -105,7 +105,7 @@ db.hotelrooms.insertMany([
   },
   {
     _id: ObjectId('688f4c48d199dd13de307cfa'),
-    hotel: ObjectId('687f72932605c427d34dd8d9'),
+    hotel: '687f72932605c427d34dd8d9',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     images: ['3.jpeg', '1.jpeg'],

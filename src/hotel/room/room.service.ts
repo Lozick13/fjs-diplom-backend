@@ -70,7 +70,7 @@ export class HotelRoomService implements IHotelRoomService {
   async update(
     id: ID,
     data: UpdateRoomDto,
-    newImages: Express.Multer.File[],
+    newImages: Express.Multer.File[] = [],
     existingImages: string[] = [],
   ): Promise<HotelRoom> {
     if (!isValidObjectId(id)) {
@@ -94,18 +94,25 @@ export class HotelRoomService implements IHotelRoomService {
 
     const allImages = [...existingImages, ...uploadedImages];
 
+    const updateData: {
+      description: string;
+      images: string[];
+      updatedAt: Date;
+      hotel: ID;
+      isEnabled?: boolean;
+    } = {
+      description: data.description,
+      images: allImages,
+      updatedAt: new Date(),
+      hotel: data.hotel,
+    };
+
+    if (typeof data.isEnabled !== 'undefined') {
+      updateData.isEnabled = data.isEnabled;
+    }
+
     const updatedRoom = await this.hotelRoomModel
-      .findByIdAndUpdate(
-        id,
-        {
-          $set: {
-            ...data,
-            images: allImages,
-            updatedAt: new Date(),
-          },
-        },
-        { new: true },
-      )
+      .findByIdAndUpdate(id, { $set: updateData }, { new: true })
       .exec();
 
     if (!updatedRoom) {

@@ -41,11 +41,8 @@ export class HotelRoomController {
       id: room._id,
       description: room.description,
       images: room.images || [],
+      isEnabled: isEnabled !== undefined ? isEnabled : room.isEnabled,
     };
-
-    if (isEnabled) {
-      result.isEnabled = true;
-    }
 
     if (room.hotel) {
       result.hotel = {
